@@ -5,10 +5,12 @@ import {
   deleteUser,
 } from "../controllers/users.controller.js";
 
+import { authorize } from "../controllers/auth.controller.js";
+
 const router = express.Router();
 
-router.get("/", getAllUsers);
-router.put("/:id", putUpdateUser);
-router.delete("/:id", deleteUser);
+router.get("/", authorize, getAllUsers);
+router.put("/:id", authorize, putUpdateUser);
+router.delete("/:id", authorize, deleteUser);
 
 export default router;

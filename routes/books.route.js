@@ -13,9 +13,9 @@ import { authorize } from "../controllers/auth.controller.js";
 const router = new Router();
 
 router.get("/", authorize, getAllBooks);
-router.get("/:id", getBookById);
-router.post("/", postNewBooks);
-router.put("/:id", putUpdateBooks);
-router.delete("/:id", deleteBooks);
+router.get("/:id", authorize, getBookById);
+router.post("/", authorize, postNewBooks);
+router.put("/:id", authorize, putUpdateBooks);
+router.delete("/:id", authorize, deleteBooks);
 
 export default router;

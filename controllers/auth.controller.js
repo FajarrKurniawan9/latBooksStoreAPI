@@ -16,13 +16,24 @@ export const register = async (req, res) => {
       });
     }
     // Cek apakah name sudah digunakan
-    const existingUser = await prisma.users.findUnique({
+    const existingUserName = await prisma.users.findUnique({
       where: { name },
     });
-    if (existingUser) {
+    if (existingUserName) {
       return res.status(409).json({
         success: false,
-        message: "Change it, it's already existed!",
+        message: `Change your name, it's already existed!`,
+      });
+    }
+
+    const existingUserEmail = await prisma.users.findUnique({
+      where: { email },
+    });
+
+    if (existingUserEmail) {
+      return res.status(409).json({
+        success: false,
+        message: `Change your email, it's already existed!`,
       });
     }
     // Buat user baru
@@ -56,10 +67,10 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { name, password } = req.body;
 
     // Validasi input
-    if (!email || !password) {
+    if (!name || !password) {
       return res.status(400).json({
         success: false,
         message: "Hey? Look at those gap in your input, do it correctly!",
@@ -68,13 +79,13 @@ export const login = async (req, res) => {
 
     // Cari user
     const user = await prisma.users.findUnique({
-      where: { email },
+      where: { name },
     });
 
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "Email it's not here guys~",
+        message: `${name} it's not here guys~`,
       });
     }
 
@@ -90,7 +101,7 @@ export const login = async (req, res) => {
     const token = jwt.sign(
       {
         id: user.id,
-        email: user.email,
+        name: user.name,
         role: user.role,
       },
       SECRET_KEY,
