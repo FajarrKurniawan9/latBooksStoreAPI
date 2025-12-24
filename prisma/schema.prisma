@@ -8,50 +8,48 @@ datasource db {
 }
 
 model order_detail {
-  id         Int              @id @default(autoincrement())
-  order_id   Int
-  books_id   Int
-  user_id    Int
-  quantity   Int
-  totalPrice Int
-  createAt   DateTime         @default(now())
-  updateAt   DateTime         @updatedAt
-  orderId    order_users_list @relation(fields: [order_id], references: [id])
-  booksId    books            @relation(fields: [books_id], references: [id])
-  userId     users            @relation(fields: [user_id], references: [id])
+  id       Int      @id @default(autoincrement())
+  order_id Int
+  books_id Int
+  user_id  Int
+  quantity Int
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+  price    Float
+
+  @@index([books_id], map: "order_detail_books_id_fkey")
+  @@index([order_id], map: "order_detail_order_id_fkey")
+  @@index([user_id], map: "order_detail_user_id_fkey")
 }
 
 model order_users_list {
-  id            Int            @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   customer_name String
   order_type    String
   pickup_date   String
-  createAt      DateTime       @default(now())
-  updateAt      DateTime       @updatedAt
-  orderDetails  order_detail[]
+  createAt      DateTime @default(now())
+  updateAt      DateTime @updatedAt
 }
 
 model books {
-  id           Int            @id @default(autoincrement())
-  name         String         @unique
-  author       String
-  price        Int
-  quantity     Int
-  image        String?
-  createAt     DateTime       @default(now())
-  updateAt     DateTime       @updatedAt
-  orderDetails order_detail[]
+  id       Int      @id @default(autoincrement())
+  name     String   @unique
+  author   String
+  price    Int
+  quantity Int
+  image    String?
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
 }
 
 model users {
-  id           Int            @id @default(autoincrement())
-  name         String         @unique
-  email        String         @unique
-  password     String
-  role         Role           @default(visitor)
-  createAt     DateTime       @default(now())
-  updateAt     DateTime       @updatedAt
-  orderDetails order_detail[]
+  id       Int      @id @default(autoincrement())
+  name     String   @unique
+  email    String   @unique
+  password String
+  role     Role     @default(visitor)
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
 }
 
 enum Role {

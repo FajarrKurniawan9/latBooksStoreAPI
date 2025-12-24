@@ -33,6 +33,9 @@ export const postCreateOrder = async (req, res) => {
     });
   }
   try {
+    const itemsWithPrice = [];
+    let totalPrice = 0;
+
     for (const item of items) {
       const books = await prisma.books.findUnique({
         where: { id: item.books_id },
@@ -49,7 +52,76 @@ export const postCreateOrder = async (req, res) => {
           message: `Insufficient stock for ${books.name}. Available: ${books.quantity}, Requested: ${item.quantity}`,
         });
       }
+
+      const subTotal = books.price * item.quantity;
+      totalPrice += subTotal;
+
+      itemsWithPrice.push({
+        books_id: item.books_id,
+        quantity: item.quantity,
+        price: books.price,
+        user_id: userId,
+      });
     }
+
+    const newOrder = await prisma.order_users_list.create({
+      data: {
+        customer_name,
+        order_type,
+        pickup_date,
+        orderDetails: {
+          create: itemsWithPrice.map((item) => ({
+            books_id: item.books_id,
+            quantity: item.quantity,
+            price: item.price,
+            user_id: item.user_id,
+          })),
+        },
+      },
+      include: {
+        orderDetails: {
+          booksId: true,
+          userId: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              role: true,
+            },
+          },
+        },
+      },
+    });
+
+    for (const item of items) {
+      await prisma.books.update({
+        where: { id: item.books_id },
+        data: {
+          quantity: {
+            decrement: item.quantity,
+          },
+        },
+      });
+    }
+
+    res.status(201).json({
+      message: "Your order it's here~",
+      data: {
+        order_id: newOrder.id,
+        customer_name: newOrder.customer_name,
+        order_type: newOrder.order_type,
+        pickup_date: newOrder.pickup_date,
+        items: newOrder.orderDetails.map((detail) => ({
+          book_name: detail.booksId.name,
+          quantity: detail.quantity,
+          price_per_unit: detail.price,
+          subTotal: detail.price * detail.quantity,
+          served_by: detail.userId.name,
+        })),
+        total_price: totalPrice,
+        created_at: newOrder.createAt,
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
