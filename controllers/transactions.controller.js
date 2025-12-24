@@ -126,3 +126,61 @@ export const postCreateOrder = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const deleteOrder = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const existingTransactions = await prisma.order_users_list.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!existingTransactions) {
+      return res.status(404).json({ message: "Transaction not found" });
+    }
+
+    await prisma.order_detail.deleteMany({
+      where: { order_id: parseInt(id) },
+    });
+
+    const deletedOrder = await prisma.order_users_list.delete({
+      where: { id: parseInt(id) },
+    });
+
+    res
+      .status(200)
+      .json({ message: "Your Order Depleted Blud, done.", data: deletedOrder });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const putUpdateOrder = async (req, res) => {
+  const { id } = req.params;
+  const { customer_name, order_type, pickup_date } = req.body;
+  try {
+    const existingUser = await prisma.order_users_list.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!existingUser) {
+      res.status(404).json({ message: "Uh huh, it doesn't even here?" });
+    }
+
+    const updateTransactions = await prisma.order_users_list.update({
+      data: {
+        customer_name: customer_name || existingUser.customer_name,
+        order_type: order_type || existingUser.order_type,
+        pickup_date: pickup_date || existingUser.pickup_date,
+      },
+    });
+
+    res
+      .status(200)
+      .json({
+        message: "Abracadabra, it's updated as you wish!",
+        data: updateTransactions,
+      });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
