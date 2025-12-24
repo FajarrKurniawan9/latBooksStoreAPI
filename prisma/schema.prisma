@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model order_detail {
+  id         Int      @id @default(autoincrement())
+  order_id   Int
+  books_id   Int
+  user_id    Int
+  quantity   Int
+  totalPrice Int
+  createAt   DateTime @default(now())
+  updateAt   DateTime @updatedAt
+
+  @@index([books_id], map: "order_detail_books_id_fkey")
+  @@index([order_id], map: "order_detail_order_id_fkey")
+  @@index([user_id], map: "order_detail_user_id_fkey")
+}
+
+model order_users_list {
+  id            Int      @id @default(autoincrement())
+  customer_name String
+  order_type    String
+  pickup_date   String
+  createAt      DateTime @default(now())
+  updateAt      DateTime @updatedAt
+}
+
+model books {
+  id       Int      @id @default(autoincrement())
+  name     String
+  author   String
+  price    Int
+  quantity Int
+  image    String?
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+}
+
+model users {
+  id       Int      @id @default(autoincrement())
+  name     String   @unique
+  email    String
+  password String
+  role     Role     @default(visitor)
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+}
+
+enum Role {
+  admin
+  member
+  visitor
+}
