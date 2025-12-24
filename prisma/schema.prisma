@@ -33,7 +33,7 @@ model order_users_list {
 
 model books {
   id       Int      @id @default(autoincrement())
-  name     String
+  name     String   @unique
   author   String
   price    Int
   quantity Int

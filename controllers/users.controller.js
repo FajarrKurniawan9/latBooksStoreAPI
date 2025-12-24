@@ -37,7 +37,7 @@ export const putUpdateUser = async (req, res) => {
         where: { name },
       });
       if (nameExists) {
-        return res.status(400).json({ message: "Username already exists" });
+        return res.status(400).json({ message: "Name already exists" });
       }
     }
 
@@ -55,14 +55,6 @@ export const putUpdateUser = async (req, res) => {
     const updatedUser = await prisma.users.update({
       where: { id: parseInt(id) },
       data,
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-      },
     });
 
     res.status(200).json({

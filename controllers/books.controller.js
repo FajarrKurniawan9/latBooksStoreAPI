@@ -73,11 +73,11 @@ export const putUpdateBooks = async (req, res) => {
   const { id } = req.params;
   const { name, author, price, quantity, image } = req.body;
   try {
-    const verify = await prisma.books.findUnique({
+    const books = await prisma.books.findUnique({
       where: { id: parseInt(id) },
     });
 
-    if (!verify) {
+    if (!books) {
       res
         .status(400)
         .json({ message: "Ey, there's no such ID like that in here~" });
@@ -119,7 +119,7 @@ export const deleteBooks = async (req, res) => {
 
     const delBooksId = await prisma.books.delete({
       where: { id: parseInt(id) },
-      data: {
+      select: {
         id: true,
         name: true,
         author: true,
