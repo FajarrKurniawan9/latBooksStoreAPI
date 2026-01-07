@@ -174,12 +174,10 @@ export const putUpdateOrder = async (req, res) => {
       },
     });
 
-    res
-      .status(200)
-      .json({
-        message: "Abracadabra, it's updated as you wish!",
-        data: updateTransactions,
-      });
+    res.status(200).json({
+      message: "Abracadabra, it's updated as you wish!",
+      data: updateTransactions,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
